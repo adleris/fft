@@ -93,6 +93,8 @@ unsigned int pow2log2(unsigned int a){
             return i-1;//why -1 !
         }
     }
+    fprintf(stderr, "input must be a power of 2 (got %u)\n", a);
+    exit(EXIT_FAILURE);
 }
 
 /* 

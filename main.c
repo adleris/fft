@@ -36,7 +36,7 @@ void fft(complex double *x, int len, complex double *y){
 
     /* take FFTs of each side */
     // the divisions here need to be adjusted!
-    // the split in half is ok, but the orders inside x must be shifted too.
+    // the split in half is ok, but the orders inside x must be shifted too. //i dont think they do
     fft(x, len/2, y);
     fft(x+len/2, len/2, y);
 
