@@ -17,11 +17,7 @@ int main(int argc, char **argv){
 
     complex double *x = NULL;
     unsigned int len = read_file(get_fname(argc, argv), &x);
-    printf("%p\n", x);
-    for (int i=0; i<len; i++){
-        // PRINT_CPLX(x[i]);
-        printf("x[%d]=%lf from [%d]\n", i, creal(x[i]), reverse(i, pow2log2(len)));
-    }
+
     complex double *y = (complex double *)malloc(len * sizeof(complex double));
     // fft(x,len,y);
 

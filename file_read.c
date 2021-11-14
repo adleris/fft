@@ -10,6 +10,7 @@ unsigned int read_file(char *fname, complex double **seq){
     //     fprintf(stderr, "read error\n");
     //     exit(EXIT_FAILURE);
     // }
+
     /* using calloc will automatically zero-pad the sequence for us */
     *seq = (complex double*)calloc(padded_len, sizeof(complex double));
 
@@ -17,11 +18,13 @@ unsigned int read_file(char *fname, complex double **seq){
     int index = 0;
     double tmp;
     while ((r=fscanf(fp, "%lf", &tmp)) != EOF){
-        /* is there an efficient way to jump right into the correct index? */
+        /* is there an efficient way to jump right into the correct index? 
+            - potentially a precomupted lookup table of index reverses. */
         index++;
-        // printf("%d\n", index);
         (*seq)[reverse(index, pow2log2(padded_len))] = tmp + 0*I; // do i have to explicityly convert to cplx
     }
+
+    // show_arr_read_in(*seq, padded_len);
 
     fclose(fp);
     return padded_len;
@@ -62,6 +65,7 @@ unsigned int reverse(unsigned int a, unsigned int nbits){
         }
     }
 
+#if SHOW_INDEX_REVERSAL
     /* display the reversal */
     printf("%u->%u\n\t",a,out);
 
@@ -76,9 +80,9 @@ unsigned int reverse(unsigned int a, unsigned int nbits){
         // if ((i +1) % 8 == 0) printf(" ");
     }
     printf("\n");
+#endif
     return out;
 }
-
 
 
 unsigned int pow2log2(unsigned int a){
@@ -88,5 +92,17 @@ unsigned int pow2log2(unsigned int a){
         if (a >> i == 0){
             return i-1;//why -1 !
         }
+    }
+}
+
+/* 
+ * Display contents of the just read in array. Also includes index in the data file that the value was originally stored at, to verify the reversal.
+ */
+void show_arr_read_in(complex double *arr, unsigned int len){
+    printf("%p\n", arr);
+    for (int i=0; i<len; i++){
+        // PRINT_CPLX(arr[i]);
+        /* only show the reals, read in data is real only */
+        printf("arr[%d]=%lf from [%d]\n", i, creal(arr[i]), reverse(i, pow2log2(len)));
     }
 }
