@@ -19,7 +19,12 @@ int main(int argc, char **argv){
     unsigned int len = read_file(get_fname(argc, argv), &x);
 
     complex double *y = (complex double *)malloc(len * sizeof(complex double));
-    // fft(x,len,y);
+    fft(x,len,y);
+
+    FILE *out = fopen("fftout.txt", "w+");
+    for (int i=0; i<len; i++){
+        fprintf(out, "%lf%s%lfi\n", creal(y[i]), (cimag(y[i])>=0.0)?"+":"", cimag(y[i]));
+    }
 
     free(x);
     free(y);
