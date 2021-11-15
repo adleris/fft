@@ -3,24 +3,21 @@
 #include <complex.h>
 
 #include "file_read.h"
-
-#define PRINT_CPLX(z) printf("%lf +j%lf\n",creal(z), cimag(z))
-
-complex double J2PI = 6.28318530718 * I;
+#include "fft.h"
 
 char *get_fname(int argc, char **argv);
-void fft(complex double *seq, int len, complex double *y);
-complex double circular_prefix(int k, int N);
-unsigned next_pow_2(unsigned int v);
 
 int main(int argc, char **argv){
 
+    /* read in a data sequence from a file */
     complex double *x = NULL;
     unsigned int len = read_file(get_fname(argc, argv), &x);
 
+    /* compute the fft */
     complex double *y = (complex double *)malloc(len * sizeof(complex double));
     fft(x,len,y);
 
+    /* output to a text file where it can be read by matlab */
     FILE *out = fopen("fftout.txt", "w+");
     for (int i=0; i<len; i++){
         fprintf(out, "%lf%s%lfi\n", creal(y[i]), (cimag(y[i])>=0.0)?"+":"", cimag(y[i]));
@@ -29,35 +26,6 @@ int main(int argc, char **argv){
     free(x);
     free(y);
     return 0;
-}
-
-void fft(complex double *x, int len, complex double *y){
-    /* recursive base case */
-    if (len == 2){
-        y[0] = x[0]+x[1];
-        y[1] = x[0]-x[1];
-        return;
-    }
-
-    /* take FFTs of each side */
-    // the divisions here need to be adjusted!
-    // the split in half is ok, but the orders inside x must be shifted too. //i dont think they do
-    fft(x, len/2, y);
-    fft(x+len/2, len/2, y);
-
-    /* recombine */
-    complex double tmp;
-    int k;
-    for (k = 0; k < len/2; k++){
-        tmp = circular_prefix(k, len) * x[len/2 + k];
-        y[k] = x[k] + tmp;
-        y[len/2 +k] = x[k] - tmp;
-    }
-}
-
-complex double circular_prefix(int k, int N){
-    /* N is power of two, can we make a simplification? */
-    return cexp( - J2PI * k / N);
 }
 
 char *get_fname(int argc, char **argv){
